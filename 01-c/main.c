@@ -34,8 +34,8 @@ int main(){
     }while(!feof(f));
 
     fclose(f);
-    printf("\n%lu\n", solution1(input, len - 1));
-    printf("\n%lu\n", solution2(input, len - 1));
+    printf("Solution 1 : %lu\n", solution1(input, len - 1));
+    printf("Solution 2 : %lu\n", solution2(input, len - 1));
 
     return 0;
 }

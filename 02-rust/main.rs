@@ -30,7 +30,7 @@ impl Policy{
         })
     }
 
-    fn solution1(self) -> bool{
+    fn solution1(&self) -> bool{
         let len: u32 = self.password
             .chars()
             .filter(|&c| c == self.letter)
@@ -41,7 +41,7 @@ impl Policy{
         min <= len && len <= max
     }
 
-    fn solution2(self) -> bool{
+    fn solution2(&self) -> bool{
         //bad rust code probably lol
         let chars: Vec<char> = self.password.chars().collect();
 
@@ -58,13 +58,17 @@ fn main(){
         fs::read_to_string(path)
         .unwrap();
 
-    let mut result: u32 = 0;
+    let mut result1: u32 = 0;
+    let mut result2: u32 = 0;
     for line in input.lines(){
         if let Some(p) = Policy::new(line){
+            if p.solution1(){
+                result1 += 1;
+            }
             if p.solution2(){
-                result += 1;
+                result2 += 1;
             }
         }
     }
-    println!("{}", result);
+    println!("Solution 1 : {}\nSolution 2 : {}", result1 , result2);
 }

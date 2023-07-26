@@ -53,6 +53,7 @@ class Main{
                 .toArray(new String[0]);
         }
 
-        System.out.println(solution2(input));
+        System.out.println("Solution 1 : " + solution1(input));
+        System.out.println("Solution 2 : " + solution2(input));
     }
 }
