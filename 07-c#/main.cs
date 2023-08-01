@@ -58,13 +58,13 @@ class Program
         return d;
     }
     
-    static int traverse(Rule rule, Dictionary<string, Rule> dict){        
+    static int traverse1(Rule rule, Dictionary<string, Rule> dict){        
         foreach(Child c in rule.children){
             if(c.color == "shiny gold"){
                 return 1;
             }
             if(!String.IsNullOrEmpty(c.color)){
-                if (traverse(dict[c.color], dict) == 1){
+                if (traverse1(dict[c.color], dict) == 1){
                     return 1;
                 }
             }
@@ -78,12 +78,28 @@ class Program
         Dictionary<string, Rule> dict = dict_of_rules(rules);
 
         foreach(Rule rule in rules){
-            result += traverse(rule, dict);
+            result += traverse1(rule, dict);
         }
 
         return result;
     }
 
+    static int traverse2(Rule rule, Dictionary<string, Rule> dict){
+        int result = 1;
+        foreach(Child c in rule.children){
+            if(!String.IsNullOrEmpty(c.color)){
+                result += c.amount * traverse2(dict[c.color], dict);
+            }
+        }
+        return result;
+    }
+    
+    static int solution2(List<Rule> rules){
+        Dictionary<string, Rule> dict = dict_of_rules(rules);
+
+        return traverse2(dict["shiny gold"], dict) - 1;
+    }
+    
     static void Main(string[] args){
         List<Rule> rules = new List<Rule>(); 
         
@@ -101,5 +117,6 @@ class Program
         }
         
         Console.WriteLine("\nSolution 1 : " + solution1(rules));
+        Console.WriteLine("\nSolution 2 : " + solution2(rules));
     }
 }
