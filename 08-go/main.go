@@ -33,7 +33,7 @@ func lines_to_inst(lines []string) []instruction {
 	return instructions
 }
 
-func check_visited(idxs []int) bool{
+func check_visited(idxs []int) bool {
 	visited := make(map[int]bool)
 
 	if len(idxs) < 2{
@@ -50,10 +50,10 @@ func check_visited(idxs []int) bool{
 	return false
 }
 
-func solution1(instrs []instruction) int {
+func solve(instrs []instruction) state {
 	state := state{acc: 0, idx: 0, visited: []int{}}
 
-	for !check_visited(state.visited) || state.idx == len(instrs){
+	for !check_visited(state.visited) && state.idx < len(instrs){
 		switch instrs[state.idx].name{
 		case "nop":
 			state.idx += 1
@@ -61,10 +61,43 @@ func solution1(instrs []instruction) int {
 			state.acc += instrs[state.idx].value
 			state.idx += 1
 		case "jmp":
-			state.idx += instrs[state.idx].value
+			if(state.idx + instrs[state.idx].value < len(instrs)){
+				state.idx += instrs[state.idx].value
+			}
 		}
 
 		state.visited = append(state.visited, state.idx)
+	}
+
+	return state
+}
+
+func solution1(instrs []instruction) int {
+	state := solve(instrs)
+
+	return state.acc
+}
+
+func solution2(instrs []instruction) int {
+	original := make([]instruction, len(instrs))
+	copy(original[:], instrs[:])
+
+	var nop_idx int = 0
+	state := solve(instrs)
+
+	for state.idx != len(instrs) - 1 {
+		j := 0
+		for i := 0; i < len(instrs); i++ {
+			if(original[i].name == "jmp" && j == nop_idx){
+				instrs[i].name = "nop"
+				state = solve(instrs)
+				break
+			} else {
+				j++
+			}
+		}
+		copy(instrs[:], original[:])
+		nop_idx++
 	}
 
 	return state.acc
@@ -86,4 +119,5 @@ func main(){
 	}
 
 	fmt.Printf("Solution 1 : %v\n", solution1(lines_to_inst(lines)))
+	fmt.Printf("Solution 2 : %v\n", solution2(lines_to_inst(lines)))
 }
