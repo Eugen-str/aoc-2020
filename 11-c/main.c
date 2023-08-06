@@ -5,7 +5,33 @@
 #define MAX_X 100
 #define MAX_Y 100
 
-int count_occupied(char input[][MAX_X], int x, int y){
+int lines;
+int line_length;
+
+int count_result(char input[][MAX_X]){
+    int count = 0;
+
+    for(int i = 0; i < lines; i++){
+        for(int j = 0; j < line_length; j++){
+            if(input[i][j] == '#')
+                count++;
+        }
+    }
+
+    return count;
+}
+
+bool check_repeat(char first[][MAX_X], char second[][MAX_X]){
+    for(int i = 0; i < lines; i++){
+        if(strcmp(first[i], second[i]) != 0){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+int count_occupied_1(char input[][MAX_X], int x, int y){
     int result = 0;
     for(int i = -1; i <= 1; i++){
         for(int j = -1; j <= 1; j++){
@@ -17,43 +43,73 @@ int count_occupied(char input[][MAX_X], int x, int y){
     return result;
 }
 
-bool check_repeat(char first[][MAX_X], char second[][MAX_X], int length){
-    for(int i = 0; i < length; i++){
-        if(strcmp(first[i], second[i]) != 0){
-            return false;
-        }
-    }
-
-    return true;
-}
-
-int solution1(char input[][MAX_X], int length, int line_length){
+int solution1(char input[][MAX_X]){
     char original[MAX_Y][MAX_X];
-    int count = 0;
+
     do{
-        for(int i = 0; i < length; i++){
+        for(int i = 0; i < lines; i++){
             strcpy(original[i], input[i]);
         }
 
-        for(int i = 0; i < length; i++){
+        for(int i = 0; i < lines; i++){
             for(int j = 0; j < line_length; j++){
-                if(original[i][j] == 'L' && count_occupied(original, i, j) == 0){
+                if(original[i][j] == 'L' && count_occupied_1(original, i, j) == 0){
                     input[i][j] = '#';
                 }
-                if(original[i][j] == '#' && count_occupied(original, i, j) >= 4){
+                if(original[i][j] == '#' && count_occupied_1(original, i, j) >= 4){
                     input[i][j] = 'L';
                 }
             }
         }
-    }while(!check_repeat(input, original, length));
+    }while(!check_repeat(input, original));
 
-    for(int i = 0; i < length; i++){
-        for(int j = 0; j < line_length; j++){
-            if(input[i][j] == '#')
+    return count_result(input);
+}
+
+int count_occupied_2(char input[][MAX_X], int x, int y){
+    int count = 0;
+    int directions[8][2] = {{1,1}, {-1, -1}, {1, -1}, {-1, 1}, {0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    for(int d = 0; d < 8; d++){
+        int i = x + directions[d][0];
+        int j = y + directions[d][1];
+        while(i >= 0 && i <= lines && j >= 0 && j <= line_length){
+            if(input[i][j] == '#'){
                 count++;
+                break;
+            }
+            else if(input[i][j] == 'L'){
+                break;
+            }
+            i+= directions[d][0];
+            j+= directions[d][1];
         }
     }
+
     return count;
+}
+
+int solution2(char input[][MAX_X]){
+    char original[MAX_Y][MAX_X];
+
+    do{
+        for(int i = 0; i < lines; i++){
+            strcpy(original[i], input[i]);
+        }
+
+        for(int i = 0; i < lines; i++){
+            for(int j = 0; j < line_length; j++){
+                if(original[i][j] == 'L' && count_occupied_2(original, i, j) == 0){
+                    input[i][j] = '#';
+                }
+                if(original[i][j] == '#' && count_occupied_2(original, i, j) >= 5){
+                    input[i][j] = 'L';
+                }
+            }
+        }
+    }while(!check_repeat(input, original));
+
+    return count_result(input);
 }
 
 int main(){
@@ -63,22 +119,23 @@ int main(){
 
     fp = fopen("input.txt", "r");
 
-    int lines = 0;
+    lines = 0;
     while(fgets(buff, MAX_X, fp) != NULL){
         strcpy(input[lines], buff);
         lines++;
     }
 
-    int line_length = 0;
+    line_length = 0;
     while(input[0][line_length + 1] != '\0'){
         line_length++;
     }
-    /*
-    printf("lines : %d\nline len : %d\n", lines, line_length);
+
+    char input_copy[MAX_Y][MAX_X];
     for(int i = 0; i < lines; i++){
-        printf("%s", input[i]);
+        strcpy(input_copy[i], input[i]);
     }
-    */
-    printf("Solution 1 : %d\n", solution1(input, lines, line_length));
+
+    printf("Solution 1 : %d\n", solution1(input_copy));
+    printf("Solution 2 : %d\n", solution2(input));
     return 0;
 }
