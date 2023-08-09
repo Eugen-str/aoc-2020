@@ -3,54 +3,58 @@ import java.util.*;
 import java.util.stream.*;
 
 class Main{
-    static int solution1(int timestamp, List<Integer> busIds){
+    static int solution1(int timestamp, int[] busIds){
         int minTime = timestamp, smId = 0;
 
-        for(int i = 0; i < busIds.size(); i++){
-            int x = busIds.get(i) - timestamp % busIds.get(i);
+        for(int i = 0; i < busIds.length; i++){
+            int x = busIds[i] - timestamp % busIds[i];
             if(x < minTime){
                 minTime = x;
-                smId = busIds.get(i);
+                smId = busIds[i];
             }
         }
         return minTime * smId;
     }
 
-    //Brute force solution, takes way too long for the actual input...
-    static long solution2(List<Integer> schedule){
-        int x = schedule.get(0);
-        for(long ts = 0; ts < Long.MAX_VALUE; ts += x){
-            boolean condition = true;
-            for(int i = 0; i < schedule.size(); i++){
-                if((ts + i) % schedule.get(i) != 0){
-                    condition = false;
-                    break;
-                }
+    //Chinese remainder theorem solution
+    public static long solution2(String[] buses) {
+        Map<Long, Long> mods = new HashMap<>();
+        for(int idx = 0; idx < buses.length; idx++){
+            if(!buses[idx].equals("x")){
+                long bus = Long.parseLong(buses[idx]);
+                mods.put(bus, (bus - idx % bus) % bus);
             }
-            if(condition)
-                return ts;
         }
-        return -1;
+
+        long iterator = 0;
+        long increment = 1;
+        for(long bus: mods.keySet()){
+            while (iterator % bus != mods.get(bus)) {
+                iterator += increment;
+            }
+            increment *= bus;
+        }
+        return iterator;
     }
 
     public static void main(String[] args) throws IOException{
-        try(var file = new BufferedReader(new FileReader("sample.txt"))){
+        try(var file = new BufferedReader(new FileReader("input.txt"))){
             String[] txtInput = file
                 .lines()
                 .collect(Collectors.toList())
                 .toArray(new String[0]);
 
             int timestamp = Integer.parseInt(txtInput[0]);
-            List<Integer> busIds1 = Arrays
+            int[] busIds1 = Arrays
                 .stream(txtInput[1].split(","))
                 .filter(n -> !n.equals("x"))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+                .mapToInt(Integer::parseInt)
+                .toArray();
 
-            List<Integer> busIds2 = Arrays
+            String[] busIds2 = Arrays
                 .stream(txtInput[1].split(","))
-                .map(n -> n.equals("x") ? 1 : Integer.parseInt(n))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                .toArray(new String[0]);
 
             System.out.println("Solution 1 : " + solution1(timestamp, busIds1));
             System.out.println("Solution 2 : " + solution2(busIds2));
