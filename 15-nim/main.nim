@@ -29,10 +29,12 @@ proc slow_solution(list: var seq[int], n: int): int =
 
   return list[len(list) - 1]
 
-#[
-Slow solution took way too long for part two,
-new function takes 10,751s.
-]#
+#
+#
+#  Slow solution took way too long for part two,
+#  new function takes ~10,688s.
+#
+#
 
 proc fast_solution(list: var seq[int], n: int): int =
   var nums = initTable[int, int]()
@@ -55,7 +57,7 @@ proc fast_solution(list: var seq[int], n: int): int =
   return prev
 
 proc main() =
-  echo "Solution 1 : ", slow_solution(input, 2020)
+  echo "Solution 1 : ", fast_solution(input, 2020)
   echo "Solution 2 : ", fast_solution(input, 30_000_000)
 
 main()
